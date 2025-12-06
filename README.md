@@ -21,7 +21,7 @@ Traditional last-click attribution models fail to capture the true contribution 
 - **Comprehensive Visualizations**: Professional charts and reports for stakeholder communication
 - **Flexible Data Input**: Works with various customer journey data formats
 
-## Installation
+## Installation 
 
 ### Prerequisites
 
