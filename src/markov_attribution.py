@@ -7,8 +7,7 @@ of each marketing channel in customer conversion journeys.
 
 import numpy as np
 import pandas as pd
-from collections import defaultdict, Counter
-from itertools import chain
+from collections import defaultdict
 
 
 class MarkovAttribution:
@@ -81,7 +80,6 @@ class MarkovAttribution:
             path = row['path']
             conversions = row['conversions']
             non_conversions = row.get('non_conversions', 0)
-            total_occurrences = conversions + non_conversions
             
             channels = [ch.strip() for ch in path.split('>')]
             
@@ -301,11 +299,14 @@ class MarkovAttribution:
             if current_allocation and channel in current_allocation:
                 row['current_budget'] = current_allocation[channel]
                 row['budget_change'] = recommended[channel] - current_allocation[channel]
-                row['budget_change_pct'] = (
-                    (recommended[channel] - current_allocation[channel]) / 
-                    current_allocation[channel] * 100
-                    if current_allocation[channel] > 0 else 0
-                )
+                if current_allocation[channel] > 0:
+                    row['budget_change_pct'] = (
+                        (recommended[channel] - current_allocation[channel]) / 
+                        current_allocation[channel] * 100
+                    )
+                else:
+                    # If current budget is 0, any positive recommendation is infinite increase
+                    row['budget_change_pct'] = float('inf') if recommended[channel] > 0 else 0
             
             results.append(row)
         
@@ -332,13 +333,19 @@ class MarkovAttribution:
             
             # Channel is undervalued if attribution > current budget share
             if attribution - current_share > threshold:
+                # Calculate recommended increase percentage
+                if current_share > 0:
+                    recommended_increase_pct = (attribution - current_share) / current_share * 100
+                else:
+                    # If current share is 0, any positive attribution represents infinite increase
+                    recommended_increase_pct = float('inf') if attribution > 0 else 0
+                
                 undervalued.append({
                     'channel': channel,
                     'attribution_weight': attribution,
                     'current_budget_share': current_share,
                     'undervaluation': attribution - current_share,
-                    'recommended_increase_pct': (attribution - current_share) / current_share * 100
-                        if current_share > 0 else float('inf')
+                    'recommended_increase_pct': recommended_increase_pct
                 })
         
         df = pd.DataFrame(undervalued)
