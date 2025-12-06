@@ -113,53 +113,48 @@ class MarkovAttribution:
         """
         Calculate the probability of conversion given a transition matrix.
         
-        Uses iterative approach to calculate probability of reaching conversion
-        state from start state.
+        Uses Monte Carlo simulation to estimate probability of reaching conversion
+        state from start state through the Markov chain.
         """
         if transition_matrix is None:
             transition_matrix = self.transition_matrix
         
-        # States that can still convert (excluding conversion and null)
-        active_states = [s for s in transition_matrix.keys() 
-                        if s not in ['conversion', 'null']]
+        if 'start' not in transition_matrix:
+            return 0.0
         
-        # Initialize probabilities
-        prob = {'start': 1.0}
-        for state in active_states:
-            if state != 'start':
-                prob[state] = 0.0
+        # Run Monte Carlo simulations
+        num_simulations = 10000
+        conversions = 0
         
-        conversion_prob = 0.0
-        
-        # Iterate until convergence
-        max_iterations = 10000
-        for iteration in range(max_iterations):
-            new_prob = prob.copy()
-            new_conversion_prob = conversion_prob
+        for _ in range(num_simulations):
+            current_state = 'start'
+            max_steps = 100
             
-            for from_state in active_states:
-                if prob[from_state] > 1e-10:  # Only process states with non-zero probability
-                    if from_state in transition_matrix:
-                        for to_state, trans_prob in transition_matrix[from_state].items():
-                            contribution = prob[from_state] * trans_prob
-                            
-                            if to_state == 'conversion':
-                                new_conversion_prob += contribution
-                                new_prob[from_state] -= contribution
-                            elif to_state == 'null':
-                                new_prob[from_state] -= contribution
-                            elif to_state in new_prob:
-                                new_prob[to_state] += contribution
-                                new_prob[from_state] -= contribution
-            
-            # Check convergence
-            if abs(new_conversion_prob - conversion_prob) < 1e-10:
-                break
-            
-            prob = new_prob
-            conversion_prob = new_conversion_prob
+            for step in range(max_steps):
+                if current_state not in transition_matrix:
+                    break
+                
+                # Get possible next states
+                next_states = list(transition_matrix[current_state].keys())
+                probabilities = list(transition_matrix[current_state].values())
+                
+                # Sample next state
+                if len(next_states) > 0 and sum(probabilities) > 0:
+                    # Normalize probabilities
+                    prob_sum = sum(probabilities)
+                    probabilities = [p / prob_sum for p in probabilities]
+                    current_state = np.random.choice(next_states, p=probabilities)
+                else:
+                    break
+                
+                # Check if we reached an end state
+                if current_state == 'conversion':
+                    conversions += 1
+                    break
+                elif current_state == 'null':
+                    break
         
-        return conversion_prob
+        return conversions / num_simulations if num_simulations > 0 else 0.0
     
     def _calculate_removal_effects(self):
         """
