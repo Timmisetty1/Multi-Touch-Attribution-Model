@@ -43,9 +43,10 @@ pip install -r requirements.txt
 
 ## Quick Start
 
-### Running the Example
+### Running the Examples
 
-The easiest way to get started is to run the example script:
+#### 1. Basic Example
+The easiest way to get started is to run the basic example script:
 
 ```bash
 python examples/example_usage.py
@@ -58,6 +59,24 @@ This will:
 4. Identify undervalued channels
 5. Recommend budget reallocation
 6. Generate comprehensive visualizations
+
+#### 2. Advanced Example (Realistic Scenario)
+For a more realistic scenario demonstrating 15%+ budget reallocation:
+
+```bash
+python examples/advanced_example.py
+```
+
+This uses realistic customer journey data showing how undervalued channels like Email and Organic Search can be identified for significant budget increases.
+
+#### 3. Interactive Jupyter Notebook
+For an interactive analysis experience:
+
+```bash
+jupyter notebook examples/attribution_analysis.ipynb
+```
+
+The notebook provides step-by-step guidance through the entire attribution analysis process.
 
 ### Using the Model with Your Data
 
@@ -129,7 +148,12 @@ Multi-Touch-Attribution-Model/
 │   ├── data_generator.py        # Sample data generation utilities
 │   └── visualization.py         # Plotting and reporting functions
 ├── examples/
-│   └── example_usage.py         # Complete example workflow
+│   ├── example_usage.py         # Basic example workflow
+│   ├── advanced_example.py      # Advanced realistic scenario
+│   └── attribution_analysis.ipynb  # Interactive Jupyter notebook
+├── tests/
+│   ├── __init__.py
+│   └── test_markov_attribution.py  # Unit tests
 ├── data/
 │   └── (your data files)
 ├── output/
@@ -137,6 +161,21 @@ Multi-Touch-Attribution-Model/
 ├── requirements.txt
 └── README.md
 ```
+
+## Testing
+
+Run the test suite to validate the implementation:
+
+```bash
+python -m unittest discover tests/ -v
+```
+
+All tests should pass, covering:
+- Model initialization and fitting
+- Attribution weight calculations
+- Budget allocation recommendations
+- Undervalued channel identification
+- Edge cases and data integrity
 
 ## Methodology
 
