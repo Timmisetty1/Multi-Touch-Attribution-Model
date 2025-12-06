@@ -6,7 +6,7 @@ A sophisticated **Markov Chain-based attribution model** for measuring marketing
 
 Traditional last-click attribution models fail to capture the true contribution of all marketing channels in a customer's journey. This project implements a **Markov Chain attribution model** that:
 
-- Measures the true effectiveness of each marketing channel
+- Measures the true effectiveness of each marketing channel 
 - Identifies undervalued channels receiving insufficient budget
 - Recommends optimal budget reallocation based on channel contribution
 - Supports analysis across 6 marketing channels (customizable)
